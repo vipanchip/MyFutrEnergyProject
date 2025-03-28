@@ -48,6 +48,9 @@ const PlantTable = () => {
   const [productDetails, setProductDetails] = useState(null);
   const [updatedTitle, setUpdatedTitle] = useState('');
   const [updatedPrice, setUpdatedPrice] = useState('');
+  const [updatedCategory, setUpdatedCategory] = useState('');
+  const [updatedDescription, setUpdatedDescription] = useState('');
+  const [updatedItemWeight, setUpdatedItemWeight] = useState('');
   const [newEntry, setNewEntry] = useState({ title: '', price: '', category: '', description: '', itemWeight: '' }); // State for new entry
   const [tableHeight, setTableHeight] = useState(fixed_table_height); // Define tableHeight in state
   const router = useRouter();
@@ -111,25 +114,20 @@ const PlantTable = () => {
   };
 
   const handleTitleClick = async (id) => {
-    console.log('Clicked ID:', id); // Debugging log
     const selectedProduct = filteredData.find((item) => item.id === id);
-    console.log('Selected Product:', selectedProduct); // Debugging log
-  
+
     if (!selectedProduct) {
       message.error('Product not found.');
       return;
     }
-  
+
     if (selectedProduct.isNew) {
       setProductDetails(selectedProduct);
       setIsModalVisible(true);
     } else {
       try {
         const response = await fetch(`https://fakestoreapi.com/products/${id}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch product details');
-        }
-        const data = await response.json()
+        const data = await response.json();
         setProductDetails(data);
         setIsModalVisible(true);
       } catch (error) {
@@ -138,23 +136,27 @@ const PlantTable = () => {
       }
     }
   };
-  
+
   const handleEdit = (record) => {
-    console.log('Editing Record:', record); // Debugging log
     setCurrentRecord(record);
     setUpdatedTitle(record.title);
     setUpdatedPrice(record.price);
+    setUpdatedCategory(record.category);
+    setUpdatedDescription(record.description);
+    setUpdatedItemWeight(record.itemWeight);
     setIsEditModalVisible(true);
   };
-  
+
   const handleUpdate = async () => {
     const updatedProduct = {
       title: updatedTitle,
       price: updatedPrice,
+      category: updatedCategory,
+      description: updatedDescription,
+      itemWeight: updatedItemWeight,
     };
-  
+
     if (currentRecord.isNew) {
-      // Update the local state for new entries
       const updatedData = filteredData.map((item) =>
         item.id === currentRecord.id ? { ...item, ...updatedProduct } : item
       );
@@ -162,20 +164,13 @@ const PlantTable = () => {
       setIsEditModalVisible(false);
       message.success('Product updated successfully!');
     } else {
-      // Update the product in the API for existing entries
       try {
         const response = await fetch(`https://fakestoreapi.com/products/${currentRecord.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedProduct),
         });
-        if (!response.ok) {
-          throw new Error('Failed to update product');
-        }
         const data = await response.json();
-        console.log('Updated Product:', data);
-  
-        // Update the local state
         const updatedData = filteredData.map((item) =>
           item.id === currentRecord.id ? { ...item, ...updatedProduct } : item
         );
@@ -188,27 +183,19 @@ const PlantTable = () => {
       }
     }
   };
-  
+
   const handleDelete = async () => {
     if (currentRecord.isNew) {
-      // Remove the new entry from the local state
       const updatedData = filteredData.filter((item) => item.id !== currentRecord.id);
       setFilteredData(updatedData);
       setIsEditModalVisible(false);
       message.success('Product deleted successfully!');
     } else {
-      // Delete the product from the API for existing entries
       try {
         const response = await fetch(`https://fakestoreapi.com/products/${currentRecord.id}`, {
           method: 'DELETE',
         });
-        if (!response.ok) {
-          throw new Error('Failed to delete product');
-        }
         const data = await response.json();
-        console.log('Deleted Product:', data);
-  
-        // Remove the deleted item from the local state
         const updatedData = filteredData.filter((item) => item.id !== currentRecord.id);
         setFilteredData(updatedData);
         setIsEditModalVisible(false);
@@ -227,21 +214,12 @@ const PlantTable = () => {
       dataIndex: 'title',
       key: 'title',
       render: (text, record) => (
-        <div className="table-text">
-          <a
-            onClick={() => handleTitleClick(record.id)}
-            style={{ color: '#1890ff', textDecoration: 'none', cursor: 'pointer' }}
-          >
-            {text}
-          </a>
-          <Button
-            type="link"
-            onClick={() => handleEdit(record)}
-            style={{ paddingLeft: '8px' }}
-          >
-            <PencilFill />
-          </Button>
-        </div>
+        <a
+          onClick={() => handleTitleClick(record.id)}
+          style={{ color: '#1890ff', textDecoration: 'none', cursor: 'pointer' }}
+        >
+          {text}
+        </a>
       ),
     },
     { title: 'Category', dataIndex: 'category', key: 'category' },
@@ -249,7 +227,7 @@ const PlantTable = () => {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      render: (price) => (price === null || price === undefined || price === '' ? '--' : price === 0 ? '0' : price),
+      render: (price) => (price === null || price === undefined ? '--' : price),
     },
     { title: 'Description', dataIndex: 'description', key: 'description' },
     {
@@ -257,6 +235,19 @@ const PlantTable = () => {
       dataIndex: 'itemWeight',
       key: 'itemWeight',
       render: (weight) => (weight === null || weight === undefined ? '--' : `${weight} kg`),
+    },
+    {
+      title: 'Edit',
+      key: 'edit',
+      render: (_, record) => (
+        <Button
+          type="link"
+          onClick={() => handleEdit(record)}
+          style={{ paddingLeft: '8px' }}
+        >
+          <PencilFill />
+        </Button>
+      ),
     },
   ];
 
@@ -316,6 +307,86 @@ const PlantTable = () => {
             }}
           />
         </div>
+        <Modal
+          title="Product Details"
+          visible={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          footer={null}
+        >
+          {productDetails && (
+            <div>
+              <p><strong>ID:</strong> {productDetails.id}</p>
+              <p><strong>Title:</strong> {productDetails.title}</p>
+              <p><strong>Price:</strong> {productDetails.price}</p>
+              <p><strong>Description:</strong> {productDetails.description}</p>
+              <p><strong>Category:</strong> {productDetails.category}</p>
+              <p>
+                <strong>Image:</strong>{' '}
+                <img
+                  src={productDetails.image}
+                  alt={productDetails.title}
+                  style={{ width: '100px' }}
+                />
+              </p>
+            </div>
+          )}
+        </Modal>
+        <Modal
+          title="Edit Product"
+          visible={isEditModalVisible}
+          onCancel={() => setIsEditModalVisible(false)}
+          footer={[
+            <Button key="delete" type="danger" onClick={handleDelete}>
+              Delete
+            </Button>,
+            <Button key="update" type="primary" onClick={handleUpdate}>
+              Update
+            </Button>,
+          ]}
+        >
+          <div>
+            <label>Title:</label>
+            <Input
+              value={updatedTitle}
+              onChange={(e) => setUpdatedTitle(e.target.value)}
+              placeholder="Enter new title"
+            />
+          </div>
+          <div style={{ marginTop: '10px' }}>
+            <label>Price:</label>
+            <Input
+              type="number"
+              value={updatedPrice}
+              onChange={(e) => setUpdatedPrice(e.target.value)}
+              placeholder="Enter new price"
+            />
+          </div>
+          <div style={{ marginTop: '10px' }}>
+            <label>Category:</label>
+            <Input
+              value={updatedCategory}
+              onChange={(e) => setUpdatedCategory(e.target.value)}
+              placeholder="Enter new category"
+            />
+          </div>
+          <div style={{ marginTop: '10px' }}>
+            <label>Description:</label>
+            <Input
+              value={updatedDescription}
+              onChange={(e) => setUpdatedDescription(e.target.value)}
+              placeholder="Enter new description"
+            />
+          </div>
+          <div style={{ marginTop: '10px' }}>
+            <label>Item Weight:</label>
+            <Input
+              type="number"
+              value={updatedItemWeight}
+              onChange={(e) => setUpdatedItemWeight(e.target.value)}
+              placeholder="Enter new item weight (kg)"
+            />
+          </div>
+        </Modal>
         <Modal
           title="Add New Entry"
           visible={isAddModalVisible}
