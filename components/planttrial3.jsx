@@ -277,7 +277,7 @@ const PlantTable = () => {
             columns={columns}
             dataSource={filteredData}
             rowKey="id"
-            scroll={{ x: 1500 }} // Horizontal scroll enabled
+            scroll={{ x: 'max-content' }}
             pagination={{
               current: currentPage,
               pageSize: pageSize,
@@ -313,76 +313,76 @@ const PlantTable = () => {
           )}
         </Modal>
         <Modal
-          title="Edit Product"
-          visible={isEditModalVisible}
-          onCancel={() => setIsEditModalVisible(false)}
-          footer={[
-            <Button key="delete" type="danger" onClick={handleDelete}>
-              Delete
-            </Button>,
-            <Button
-              key="update"
-              type="primary"
-              onClick={handleUpdate}
-              disabled={
-                !updatedTitle.trim() ||
-                !updatedPrice ||
-                !updatedCategory.trim() ||
-                !updatedDescription.trim() ||
-                !updatedItemWeight
-              }
-            >
-              Update
-            </Button>,
-          ]}
-        >
-          <div>
-            <label>Title:</label>
-            <Input
-              value={updatedTitle}
-              onChange={(e) => setUpdatedTitle(e.target.value)}
-              placeholder="Enter new title"
-            />
-          </div>
-          <div style={{ marginTop: '10px' }}>
-            <label>
-              Price: <span style={{ color: 'red' }}>*</span>
-            </label>
-            <Input
-              type="number"
-              value={updatedPrice}
-              onChange={(e) => setUpdatedPrice(e.target.value)}
-              placeholder="Enter new price"
-            />
-          </div>
-          <div style={{ marginTop: '10px' }}>
-            <label>Category:</label>
-            <Input
-              value={updatedCategory}
-              onChange={(e) => setUpdatedCategory(e.target.value)}
-              placeholder="Enter new category"
-            />
-          </div>
-          <div style={{ marginTop: '10px' }}>
-            <label>Description:</label>
-            <Input
-              value={updatedDescription}
-              onChange={(e) => setUpdatedDescription(e.target.value)}
-              placeholder="Enter new description"
-            />
-          </div>
-          <div style={{ marginTop: '10px' }}>
-            <label>
-              Item Weight: <span style={{ color: 'red' }}>*</span>
-            </label>
-            <Input
-              type="number"
-              value={updatedItemWeight}
-              onChange={(e) => setUpdatedItemWeight(e.target.value)}
-              placeholder="Enter new item weight (kg)"
-            />
-          </div>
-        </Modal>
+  title="Edit Product"
+  visible={isEditModalVisible}
+  onCancel={() => setIsEditModalVisible(false)}
+  footer={[
+    <Button key="delete" type="danger" onClick={handleDelete}>
+      Delete
+    </Button>,
+    <Button
+      key="update"
+      type="primary"
+      onClick={handleUpdate}
+      disabled={
+        !updatedTitle.trim() ||
+        !updatedPrice ||
+        !updatedCategory.trim() ||
+        !updatedDescription.trim() ||
+        !updatedItemWeight
+      }
+    >
+      Update
+    </Button>,
+  ]}
+>
+  <div>
+    <label>Title:</label>
+    <Input
+      value={updatedTitle}
+      onChange={(e) => setUpdatedTitle(e.target.value)}
+      placeholder="Enter new title"
+    />
+  </div>
+  <div style={{ marginTop: '10px' }}>
+    <label>
+      Price: <span style={{ color: 'red' }}>*</span>
+    </label>
+    <Input
+      type="number"
+      value={updatedPrice}
+      onChange={(e) => setUpdatedPrice(e.target.value)}
+      placeholder="Enter new price"
+    />
+  </div>
+  <div style={{ marginTop: '10px' }}>
+    <label>Category:</label>
+    <Input
+      value={updatedCategory}
+      onChange={(e) => setUpdatedCategory(e.target.value)}
+      placeholder="Enter new category"
+    />
+  </div>
+  <div style={{ marginTop: '10px' }}>
+    <label>Description:</label>
+    <Input
+      value={updatedDescription}
+      onChange={(e) => setUpdatedDescription(e.target.value)}
+      placeholder="Enter new description"
+    />
+  </div>
+  <div style={{ marginTop: '10px' }}>
+    <label>
+      Item Weight: <span style={{ color: 'red' }}>*</span>
+    </label>
+    <Input
+      type="number"
+      value={updatedItemWeight}
+      onChange={(e) => setUpdatedItemWeight(e.target.value)}
+      placeholder="Enter new item weight (kg)"
+    />
+  </div>
+</Modal>
         <Modal
           title="Add New Entry"
           visible={isAddModalVisible}

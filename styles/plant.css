@@ -1,0 +1,15 @@
+.custom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .custom-col {
+    flex: 1;
+    padding: 0 10px;
+  }
+  
+  .text-right {
+    text-align: right;
+  }
